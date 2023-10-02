@@ -12,9 +12,9 @@ def make_request_header() -> dict:
     # Declare empty header dictionary
     apiHeader = {}
     # open token
-    token = 'e67ee428b00422c5189309e7907a2b16d8a5f1f95c703cdf9925ab6d696c2362a03ea97097173314c33c28b934950bc6' # copy and paste from the SwitchBot app V6.14 or later
+    token = "f7958620709d165f52d7509e8c34de0b780ce4b6f513c938c12946ddd8cfd4393e3287d56c290ce9c3db06a2d551991f" # copy and paste from the SwitchBot app V6.14 or later
     # secret key
-    secret = '4546afba9093d230e5539b60eb88af34' # copy and paste from the SwitchBot app V6.14 or later
+    secret = "86a21e95224a02fa4b0962d674f90a8a" # copy and paste from the SwitchBot app V6.14 or later
     nonce = uuid.uuid4()
     t = int(round(time.time() * 1000))
     string_to_sign = '{}{}{}'.format(token, t, nonce)
