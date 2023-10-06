@@ -6,7 +6,8 @@ import base64
 import requests
 import json
 import uuid
-
+import serial
+import time
 
 def make_request_header() -> dict:
     # Declare empty header dictionary

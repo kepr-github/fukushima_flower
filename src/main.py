@@ -1,9 +1,19 @@
 import cv2
 import time
 import datetime
-import os 
+import os
+import serial
+import time
 
+#set up your serial port with the desire COM port and baudrate.
+signal = serial.Serial('COM3', baudrate=9600, bytesize=8, stopbits=1, timeout=.1)
 cap = cv2.VideoCapture(0)
+
+def turnon(secound):
+    signal.write("AT+CH1=1".encode())
+    time.sleep(8)
+    signal.write("AT+CH1=0".encode())
+
 
 def make_new_dir():
     now = datetime.datetime.now()
@@ -46,9 +56,12 @@ def caputure(dirpath):
     # cv2.imshow(filename, frame)
 
 if __name__ == "__main__":
+    # turnon(10)
+    signal.write("AT+CH1=1".encode())
     get_camera_propaties()
     dirpath = make_new_dir()
     count = 0
+    basetime 
     while(True):
         count += 1
         caputure(dirpath)
@@ -56,8 +69,9 @@ if __name__ == "__main__":
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-        if count == 1:
+        if count == 10:
             break
 
     cap.release()
+    signal.write("AT+CH1=0".encode())
 
