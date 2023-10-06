@@ -60,16 +60,16 @@ if __name__ == "__main__":
     signal.write("AT+CH1=1".encode())
     get_camera_propaties()
     dirpath = make_new_dir()
-    count = 0
-    basetime 
+    # count = 0
+    basetime  = time.time()
     while(True):
-        count += 1
+        # count += 1
         caputure(dirpath)
         time.sleep(1)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-        if count == 10:
+        if time.time()-basetime > 60:
             break
 
     cap.release()
