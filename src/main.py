@@ -4,6 +4,8 @@ import datetime
 import os
 import serial
 import time
+import schedule
+
 
 #set up your serial port with the desire COM port and baudrate.
 signal = serial.Serial('COM3', baudrate=9600, bytesize=8, stopbits=1, timeout=.1)
@@ -55,7 +57,7 @@ def caputure(dirpath):
     cv2.imwrite(filename, frame)
     # cv2.imshow(filename, frame)
 
-if __name__ == "__main__":
+def main():
     # turnon(10)
     signal.write("AT+CH1=1".encode())
     get_camera_propaties()
@@ -74,4 +76,10 @@ if __name__ == "__main__":
 
     cap.release()
     signal.write("AT+CH1=0".encode())
+
+if __name__ == "__main__":
+    schedule.every(1).hours.do(main)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
 
