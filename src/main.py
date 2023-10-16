@@ -5,11 +5,37 @@ import os
 import serial
 import time
 import schedule
+import numpy as np
+import winsound
+import logging
+
+# getLoggerにモジュール名を与える(このファイルを直接実行する場合は__main__になります)
+logger = logging.getLogger(__name__)
+# これを設定しておかないと後のsetLevelでDEBUG以下を指定しても効かないっぽい
+logger.setLevel(logging.DEBUG)
+
+# 出力先を指定している(今回はtest.logというファイルを指定)
+handler = logging.FileHandler('./logs/test.log')
+
+# そのハンドラの対象のレベルを設定する(今回はDEBUG以上)
+handler.setLevel(logging.DEBUG)
+
+# どんなフォーマットにするかを指定する。公式に使える変数は書いてますね。
+formatter = logging.Formatter('%(levelname)s  %(asctime)s  [%(name)s] %(message)s')
+handler.setFormatter(formatter)
+
+# 設定したハンドラをloggerに適用している
+logger.addHandler(handler)
 
 
 #set up your serial port with the desire COM port and baudrate.
 signal = serial.Serial('COM3', baudrate=9600, bytesize=8, stopbits=1, timeout=.1)
 cap = cv2.VideoCapture(0)
+
+def makesound():
+    frequency = 1000
+    duration = 100
+    winsound.Beep(frequency, duration)
 
 def turnon(secound):
     signal.write("AT+CH1=1".encode())
@@ -44,8 +70,8 @@ def get_camera_propaties():
             'WHITE_BALANCE',
             'RECTIFICATION']
 
-    for num in range(19):
-        print(params[num], ':', cap.get(num))
+#    for num in range(19):
+#        print(params[num], ':', cap.get(num))
 
 def caputure(dirpath):
     ret, frame = cap.read()
@@ -59,6 +85,8 @@ def caputure(dirpath):
 
 def main():
     # turnon(10)
+    logger.debug(datetime.datetime.now().strftime('%Y%m%H%M%S'))
+    makesound()
     signal.write("AT+CH1=1".encode())
     get_camera_propaties()
     dirpath = make_new_dir()
@@ -71,15 +99,19 @@ def main():
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-        if time.time()-basetime > 60:
+        if time.time()-basetime > 30:
             break
 
     cap.release()
     signal.write("AT+CH1=0".encode())
+    logger.debug('finish')
+
 
 if __name__ == "__main__":
-    schedule.every(1).hours.do(main)
+    main()
+    schedule.every(5).minutes.do(main)
     while True:
+        logger.debug("running")
         schedule.run_pending()
         time.sleep(1)
 
