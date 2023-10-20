@@ -27,13 +27,11 @@ handler.setFormatter(formatter)
 # 設定したハンドラをloggerに適用している
 logger.addHandler(handler)
 
-
-#set up your serial port with the desire COM port and baudrate.
-signal = serial.Serial('COM3', baudrate=9600, bytesize=8, stopbits=1, timeout=.1)
 cap = cv2.VideoCapture(0)
+cap1 = cv2.VideoCapture(1)
 
 def makesound():
-    frequency = 1000
+    frequency = 700
     duration = 100
     winsound.Beep(frequency, duration)
 
@@ -43,9 +41,9 @@ def turnon(secound):
     signal.write("AT+CH1=0".encode())
 
 
-def make_new_dir():
+def make_new_dir(number):
     now = datetime.datetime.now()
-    dirname = './output/' + now.strftime('%Y%m%d%H%M')
+    dirname = f'./output/{number}/' + now.strftime('%Y%m%d%H%M')
     os.mkdir(dirname)
     return dirname
 
@@ -83,35 +81,51 @@ def caputure(dirpath):
     cv2.imwrite(filename, frame)
     # cv2.imshow(filename, frame)
 
+def caputure1(dirpath):
+    ret, frame = cap1.read()
+    # resize the window
+    # windowsize = (800, 600)
+    # frame = cv2.resize(frame, windowsize)
+    now = datetime.datetime.now()
+    filename = f'{dirpath}/sfm_1' + now.strftime('%Y%m%d_%H%M%S') + '.jpg'
+    # print(frame)
+    cv2.imwrite(filename, frame)
+    # cv2.imshow(filename, frame)
+
 def main():
     # turnon(10)
+
     logger.debug(datetime.datetime.now().strftime('%Y%m%H%M%S'))
+    #set up your serial port with the desire COM port and baudrate.
+    signal = serial.Serial('COM3', baudrate=9600, bytesize=8, stopbits=1, timeout=.1)
     makesound()
     signal.write("AT+CH1=1".encode())
-    get_camera_propaties()
-    dirpath = make_new_dir()
+    # get_camera_propaties()
+    dirpath0 = make_new_dir(0)
+    dirpath1 = make_new_dir(1)
     # count = 0
     basetime  = time.time()
     while(True):
         # count += 1
-        caputure(dirpath)
-        time.sleep(1)
+        caputure(dirpath0)
+        caputure1(dirpath1)
+        time.sleep(0.5)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-        if time.time()-basetime > 30:
+        if time.time()-basetime > 60:
             break
 
-    cap.release()
+    #cap.release()
     signal.write("AT+CH1=0".encode())
     logger.debug('finish')
 
 
 if __name__ == "__main__":
     main()
-    schedule.every(5).minutes.do(main)
-    while True:
-        logger.debug("running")
-        schedule.run_pending()
-        time.sleep(1)
+ #   schedule.every(30).minutes.do(main)
+ #   while True:
+##        logger.debug("running")
+ #       schedule.run_pending()
+ #       time.sleep(1)
 
